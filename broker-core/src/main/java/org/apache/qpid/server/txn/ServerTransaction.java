@@ -89,7 +89,7 @@ public interface ServerTransaction
      *
      * A store operation will result only for a if the record is not null.
      */
-    void dequeue(MessageEnqueueRecord record, Action postTransactionAction);
+    void dequeue(MessageInstance message, Action postTransactionAction);
 
     /** 
      * Dequeue a message(s) from queue(s) registering a post transaction action.

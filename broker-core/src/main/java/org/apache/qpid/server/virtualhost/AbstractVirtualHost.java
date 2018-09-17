@@ -2119,12 +2119,11 @@ public abstract class AbstractVirtualHost<X extends AbstractVirtualHost<X>> exte
             @Override
             public void dequeue(final QueueEntry messageInstance)
             {
-                final ServerTransaction.Action deleteAction = new ServerTransaction.Action()
+                final ServerTransaction.Action noop = new ServerTransaction.Action()
                 {
                     @Override
                     public void postCommit()
                     {
-                        messageInstance.delete();
                     }
 
                     @Override
@@ -2139,12 +2138,12 @@ public abstract class AbstractVirtualHost<X extends AbstractVirtualHost<X>> exte
                                                                         public void run()
                                                                         {
                                                                             ServerTransaction txn = new AutoCommitTransaction(store);
-                                                                            txn.dequeue(messageInstance.getEnqueueRecord(), deleteAction);
+                                                                            txn.dequeue(messageInstance, noop);
                                                                         }
                                                                     });
                 if(acquired)
                 {
-                    txn.dequeue(messageInstance.getEnqueueRecord(), deleteAction);
+                    txn.dequeue(messageInstance, noop);
                 }
             }
 

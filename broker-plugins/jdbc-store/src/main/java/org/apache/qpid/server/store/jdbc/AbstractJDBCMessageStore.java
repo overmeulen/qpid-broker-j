@@ -44,6 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import org.apache.qpid.server.message.MessageInstance;
 import org.slf4j.Logger;
 
 import org.apache.qpid.server.bytebuffer.QpidByteBuffer;
@@ -1105,13 +1106,15 @@ public abstract class AbstractJDBCMessageStore implements MessageStore
         }
 
         @Override
-        public void dequeueMessage(final MessageEnqueueRecord enqueueRecord)
+        public void dequeueMessage(final MessageInstance message)
         {
             checkMessageStoreOpen();
 
+            MessageEnqueueRecord enqueueRecord = message.getEnqueueRecord();
             AbstractJDBCMessageStore.this.dequeueMessage(_connWrapper,
                                                          enqueueRecord.getQueueId(),
                                                          enqueueRecord.getMessageNumber());
+            message.delete(_connWrapper);
         }
 
         @Override

@@ -23,6 +23,7 @@ package org.apache.qpid.server.store;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.apache.qpid.server.message.EnqueueableMessage;
+import org.apache.qpid.server.message.MessageInstance;
 
 public interface Transaction
 {
@@ -36,7 +37,7 @@ public interface Transaction
      */
     MessageEnqueueRecord enqueueMessage(TransactionLogResource queue, EnqueueableMessage message);
 
-    void dequeueMessage(MessageEnqueueRecord enqueueRecord);
+    void dequeueMessage(MessageInstance message);
 
     /**
      * Commits all operations performed within a given transactional context.

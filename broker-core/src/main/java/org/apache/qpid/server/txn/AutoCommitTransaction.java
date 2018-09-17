@@ -21,7 +21,6 @@
 package org.apache.qpid.server.txn;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,17 +74,18 @@ public class AutoCommitTransaction implements ServerTransaction
     }
 
     @Override
-    public void dequeue(MessageEnqueueRecord record, Action postTransactionAction)
+    public void dequeue(MessageInstance message, Action postTransactionAction)
     {
         Transaction txn = null;
         try
         {
-            if(record != null)
+            if(message != null)
             {
-                LOGGER.debug("Dequeue of message number {} from transaction log. Queue : {}", record.getMessageNumber(), record.getQueueId());
+                MessageEnqueueRecord enqueueRecord = message.getEnqueueRecord();
+                LOGGER.debug("Dequeue of message number {} from transaction log. Queue : {}", enqueueRecord.getMessageNumber(), enqueueRecord.getQueueId());
 
                 txn = _messageStore.newTransaction();
-                txn.dequeueMessage(record);
+                txn.dequeueMessage(message);
                 txn.commitTran();
                 txn = null;
             }
@@ -101,16 +101,16 @@ public class AutoCommitTransaction implements ServerTransaction
 
 
     @Override
-    public void dequeue(Collection<MessageInstance> queueEntries, Action postTransactionAction)
+    public void dequeue(Collection<MessageInstance> messages, Action postTransactionAction)
     {
         Transaction txn = null;
         try
         {
-            for(MessageInstance entry : queueEntries)
+            for(MessageInstance message : messages)
             {
-                MessageEnqueueRecord enqueueRecord = entry.getEnqueueRecord();
-                if(enqueueRecord != null)
+                if(message != null)
                 {
+                    MessageEnqueueRecord enqueueRecord = message.getEnqueueRecord();
                     LOGGER.debug("Dequeue of message number {} from transaction log. Queue : {}", enqueueRecord.getMessageNumber(), enqueueRecord.getQueueId());
 
                     if(txn == null)
@@ -118,7 +118,7 @@ public class AutoCommitTransaction implements ServerTransaction
                         txn = _messageStore.newTransaction();
                     }
 
-                    txn.dequeueMessage(enqueueRecord);
+                    txn.dequeueMessage(message);
                 }
 
             }
